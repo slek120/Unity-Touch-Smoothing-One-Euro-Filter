@@ -5,8 +5,8 @@ A unity implementation of [Exponential Smoothing](http://en.wikipedia.org/wiki/E
 
 How To Use:
 -------------------
-1. Add the script to a Game Object
-2. Set the public variables
+1. Add the script to a Game Object.
+2. Set the public variables.
 2a. For Exponential Smoothing, set Alpha to 1 and decrease until jitter is reasonable. Alpha closer to 0 increases lag.
 2b. For One Euro Filter, set Jitter Reduction to 1 and Lag Reduction to 0. Increase the values to reduce jitter and lag.
 3. For general use, instead of Input.GetTouch(0).position, call OneEuroFilter and use filteredPosition.
