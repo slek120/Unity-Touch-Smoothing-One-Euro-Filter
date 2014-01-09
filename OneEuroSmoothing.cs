@@ -30,28 +30,36 @@ public class OneEuroSmoothing : MonoBehaviour
 		if (Input.touchCount > 0) {
 			UnityEngine.Touch touch = Input.GetTouch (0);
 			currentPosition = touch.position;
-			currentVelocity = (currentPosition - filteredPosition) / Time.deltaTime;
 		}
+		currentVelocity = (currentPosition - filteredPosition) / Time.deltaTime;
 
 		OneEuroFilter (currentPosition, currentVelocity, Time.deltaTime);
-		
 		transform.position = Camera.main.ScreenToWorldPoint (new Vector3 (filteredPosition.x, filteredPosition.y, 8));
 	}
 	
 	void OneEuroFilter (Vector2 currentPosition, Vector2 currentVelocity, float dt)
 	{
-		//Skip if filtering is unnecessary
+		if (Mathf.Approximately (currentVelocity.x, filteredVelocity.x) &&
+			Mathf.Approximately (currentVelocity.y, filteredVelocity.y)) {
+			//Skip if filtering is unnecessary
+			filteredVelocity = currentVelocity;
+		} else {
+			//Get a smooth velocity using exponential smoothing
+			filteredVelocity = Filter (currentVelocity, filteredVelocity, Alpha (Vector2.one, dt));
+		}
+
 		if (Mathf.Approximately (currentPosition.x, filteredPosition.x) &&
-			Mathf.Approximately (currentPosition.y, filteredPosition.y))
-			return;
-		//Get a smooth velocity using exponential smoothing
-		filteredVelocity = Filter (currentVelocity, filteredVelocity, Alpha (Vector2.one, dt));
-		//Use velocity to get smoothing factor for position
-		Vector2 cutoffFrequency;
-		cutoffFrequency.x = jitterReduction + 0.01f * lagReduction * Mathf.Abs (filteredVelocity.x);
-		cutoffFrequency.y = jitterReduction + 0.01f * lagReduction * Mathf.Abs (filteredVelocity.y);
-		//Get a smooth position using exponential smoothing with smoothing factor from velocity
-		filteredPosition = Filter (currentPosition, filteredPosition, Alpha (cutoffFrequency, dt));
+			Mathf.Approximately (currentPosition.y, filteredPosition.y)) {
+			//Skip if filtering is unnecessary
+			filteredPosition = currentPosition;
+		} else {
+			//Use velocity to get smoothing factor for position
+			Vector2 cutoffFrequency;
+			cutoffFrequency.x = jitterReduction + 0.01f * lagReduction * Mathf.Abs (filteredVelocity.x);
+			cutoffFrequency.y = jitterReduction + 0.01f * lagReduction * Mathf.Abs (filteredVelocity.y);
+			//Get a smooth position using exponential smoothing with smoothing factor from velocity
+			filteredPosition = Filter (currentPosition, filteredPosition, Alpha (cutoffFrequency, dt));
+		}
 	}
 	
 	Vector2 Alpha (Vector2 cutoff, float dt)
