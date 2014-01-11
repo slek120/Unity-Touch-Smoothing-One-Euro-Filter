@@ -39,8 +39,7 @@ public class OneEuroSmoothing : MonoBehaviour
 	
 	void OneEuroFilter (Vector2 currentPosition, Vector2 currentVelocity, float dt)
 	{
-		if (Mathf.Approximately (currentVelocity.x, filteredVelocity.x) &&
-			Mathf.Approximately (currentVelocity.y, filteredVelocity.y)) {
+		if (Mathf.Approximately ((currentVelocity - filteredVelocity).sqrMagnitude, 0)) {
 			//Skip if filtering is unnecessary
 			filteredVelocity = currentVelocity;
 		} else {
@@ -48,8 +47,7 @@ public class OneEuroSmoothing : MonoBehaviour
 			filteredVelocity = Filter (currentVelocity, filteredVelocity, Alpha (Vector2.one, dt));
 		}
 
-		if (Mathf.Approximately (currentPosition.x, filteredPosition.x) &&
-			Mathf.Approximately (currentPosition.y, filteredPosition.y)) {
+		if (Mathf.Approximately ((currentPosition - filteredPosition).sqrMagnitude, 0)) {
 			//Skip if filtering is unnecessary
 			filteredPosition = currentPosition;
 		} else {
